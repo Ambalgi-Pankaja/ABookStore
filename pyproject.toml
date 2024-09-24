@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "ABookStore"
+version = "0.1"
+description = "A simple Book store where user can login and purchase books"
+authors = ["Pankaja Ambalgi <pankaja.ambalgi@gmail.com>"]
+
+[tool.poetry.scripts]
+a-book-store = 'a_book_store.cli:main'
+
+[tool.poetry.dependencies]
+python = ">=3.8.1, <4.0"
+fastapi = "^0"
+uvicorn = "^0.17.6"
+requests = "^2.28.0"
+pymongo = "^4.3.2"
+bcrypt = "^4.0.1"
+pytest-asyncio = "^0.21.1"
+
+[tool.poetry.dev-dependencies]
+black = "24.8.0"
+flake8 = "7.1.1"
+pytest = "8.3.2"
+pytest-cov = "*"
+bandit = "1.7.10"
+
+[tool.bandit.assert_used]
+skips = ["*/tests_*.py"]
+
+
+[build-system]
+requires = ["poetry-core >=1.0.0"]
+build-backend = "poetry.core.masonry.api"
