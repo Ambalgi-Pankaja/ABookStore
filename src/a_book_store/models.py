@@ -22,8 +22,18 @@ class ColorEnum(str, Enum):
 
 
 class User(BaseModel):
-    name: str
-    email_id: str
+    username: str
     password: str
-    role: ColorEnum
-    location: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+
+class UserInDB(User):
+    hashed_password: str

@@ -16,6 +16,9 @@ pymongo = "^4.3.2"
 bcrypt = "^4.0.1"
 pytest-asyncio = "^0.21.1"
 pydantic-settings = "*"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 black = "24.8.0"

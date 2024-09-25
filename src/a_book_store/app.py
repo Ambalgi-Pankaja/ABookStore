@@ -11,8 +11,10 @@ from bson import json_util
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
-from fastapi import HTTPException
-from fastapi import Body, FastAPI, Query, status
+from fastapi import Body, FastAPI, Query, status, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
+
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
@@ -25,7 +27,8 @@ from a_book_store.utils import (
     get_next_page
 )
 from a_book_store.config import Config
-from a_book_store.models import Book, User
+from a_book_store.models import Book, User, Token
+from a_book_store.password_management import authenticate_user, get_user_fromdb, create_access_token, get_current_user
 
 START_TIME = None
 VERSION = "v1"
@@ -42,7 +45,7 @@ LOG = get_logger()
 
 def bootstrap() -> MongoClient:
     config = Config()
-    mongo_client = MongoClient(config.database_usi)
+    mongo_client = MongoClient(config.database_uri)
     if mongo_client:
         return mongo_client
     raise PyMongoError(message="Unable to create Mongo client.")
@@ -77,8 +80,24 @@ async def ping():
     return {"Success"}
 
 
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=60)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @app.post("/book")
-async def add_book(book: Book = Body(default=None)):
+async def add_book(book: Book = Body(default=None),  current_user: User = Depends(get_current_user)):
     try:
         book_json = jsonable_encoder(book)
 
@@ -110,7 +129,7 @@ async def get_books(
     author: Optional[str] = Query(None, description="Author of the book"),
     published_year: Optional[str] = Query(None, description="Published year of the book"),
     genre: Optional[str] = Query(None, description="Genre of the book"),
-    max_price: Optional[float] = Query(None, description="Max price of the book")
+    max_price: Optional[float] = Query(None, description="Max price of the book"),
 ):
     try:
         queries = []
@@ -153,7 +172,7 @@ async def get_books(
     response_description="Patch partial Book details",
     description="Patch Book details for given book title"
 )
-def patch_book(title: str, book: Book = Body(default=None)):
+def patch_book(title: str, book: Book = Body(default=None),  current_user: User = Depends(get_current_user)):
     try:
         current_book = client[DB_NAME][BOOK_COLLECTION].find_one(
             {"title": title},
@@ -205,7 +224,7 @@ def patch_book(title: str, book: Book = Body(default=None)):
 
 
 @app.delete("/book/{title}")
-def delete_book(title: str):
+def delete_book(title: str,  current_user: User = Depends(get_current_user)):
     try:
         delete_result = client[DB_NAME][BOOK_COLLECTION].delete_one({"title": title})
         if delete_result.deleted_count == 1:

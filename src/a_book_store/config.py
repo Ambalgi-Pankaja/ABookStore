@@ -10,7 +10,7 @@ class Config(BaseSettings):
         default="0.0.0.0", env=f"{ENV_PREFIX}bind_address"
     )
     port: int = 8080
-    database_usi: Optional[str] = Field(
+    database_uri: Optional[str] = Field(
         default=None, env=f"{ENV_PREFIX}database_uri"
     )
 
