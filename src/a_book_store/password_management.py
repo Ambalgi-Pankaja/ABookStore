@@ -8,7 +8,7 @@ from fastapi import status, Depends
 from fastapi.security import OAuth2PasswordBearer
 
 from a_book_store.config import Config
-from a_book_store.models import UserInDB, User
+from a_book_store.models import UserInDB
 
 from pymongo import MongoClient
 
@@ -71,7 +71,7 @@ def get_user_fromdb(username: str):
         result = mongo_client[DB_NAME][USER_COLLECTION].find_one({"username": username})
         return UserInDB(**result)
     except Exception as exc:
-        "Error while fetching user"
+        f"Error while fetching user with error {exc}"
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):

@@ -4,14 +4,14 @@ import argparse
 import os
 import json
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 from bson import json_util
 
 
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
-from fastapi import Body, FastAPI, Query, status, Depends, HTTPException, status
+from fastapi import Body, FastAPI, Query, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
@@ -22,13 +22,10 @@ from a_book_store.utils import (
     RequestLoggerMiddleware,
     get_logger,
     calculate_record_skip,
-    total_number_pages,
-    get_prev_page,
-    get_next_page
 )
 from a_book_store.config import Config
 from a_book_store.models import Book, User, Token
-from a_book_store.password_management import authenticate_user, get_user_fromdb, create_access_token, get_current_user
+from a_book_store.password_management import authenticate_user, create_access_token, get_current_user
 
 START_TIME = None
 VERSION = "v1"
@@ -255,7 +252,7 @@ def run():
     )
     argp.add_argument(
         "--databaseuri",
-        help=f"URI for mongodb.",
+        help="URI for mongodb.",
         default=None,
     )
     argp.add_argument(

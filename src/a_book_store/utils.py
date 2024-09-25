@@ -67,6 +67,7 @@ def total_number_pages(total_items: int, limit: int) -> int:
     total_pages = math.ceil(total_items/limit)
     return total_pages
 
+
 def has_next(page, total_pages):
     """
     Method to return True if next page exists
@@ -76,11 +77,13 @@ def has_next(page, total_pages):
     """
     return page < total_pages
 
+
 def has_prev(page):
     """"
     Method to return True if prev page exists
     """
     return page > 1
+
 
 def get_prev_page(page):
     if has_prev(page):

@@ -1,0 +1,10 @@
+name: A book store - Lint check
+on: push
+jobs:
+  lint_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
