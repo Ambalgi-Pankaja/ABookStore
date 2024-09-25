@@ -5,7 +5,6 @@ from typing import Optional
 
 from fastapi import HTTPException
 from fastapi import status, Depends
-
 from fastapi.security import OAuth2PasswordBearer
 
 from a_book_store.config import Config
