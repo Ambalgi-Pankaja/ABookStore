@@ -9,4 +9,4 @@ jobs:
       - name: flake8 Lint
         uses: py-actions/flake8@v2
       - name: Run flake8 lint
-        uses: flake8 .\src\
+        run: flake8 .\src\
