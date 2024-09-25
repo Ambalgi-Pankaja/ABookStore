@@ -4,11 +4,14 @@ import argparse
 import os
 import json
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+from bson import json_util
+
 
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
+from fastapi import HTTPException
 from fastapi import Body, FastAPI, Query, status
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
@@ -87,9 +90,140 @@ async def add_book(book: Book = Body(default=None)):
         )
         if new_book:
             return JSONResponse(status_code=status.HTTP_201_CREATED, content=new_book)
+    except HTTPException as http_exc:
+        raise http_exc  # Reraise HTTPExceptions
     except Exception as exc:
+        # Handle general exceptions and raise 500 internal server error
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error occurred while creating the book with {exc}"
+        )
+
+
+@app.get("/book")
+async def get_books(
+    page: int = Query(1, description="Page number"),
+    page_size: int = Query(10, description="Number of items per page"),
+    title: Optional[str] = Query(
+        None, description="Title of the book"
+    ),
+    author: Optional[str] = Query(None, description="Author of the book"),
+    published_year: Optional[str] = Query(None, description="Published year of the book"),
+    genre: Optional[str] = Query(None, description="Genre of the book"),
+    max_price: Optional[float] = Query(None, description="Max price of the book")
+):
+    try:
+        queries = []
+        if title is not None:
+            queries.append({"title": title})
+        if author is not None:
+            queries.append({"author": author})
+        if published_year is not None:
+            queries.append({"published_year": published_year})
+        if genre is not None:
+            queries.append({"genre": genre})
+        if max_price is not None:
+            queries.append({"price": {"$lt": max_price}})
+        final_query = {}
+        if queries:
+            final_query = {"$and": queries}
+        offset = calculate_record_skip(page=page, page_size=page_size)
+        limit = page_size
+        result = list(client[DB_NAME][BOOK_COLLECTION].find(
+            final_query, {"_id": False}
+        ).skip(offset).limit(limit))
+
         return JSONResponse(
-            status_code=status.HTT
+            status_code=status.HTTP_200_OK,
+            content=json.loads(json_util.dumps(result))
+        )
+    except HTTPException as http_exc:
+        raise http_exc  # Reraise HTTPExceptions
+    except Exception as exc:
+        # Handle general exceptions and raise 500 internal server error
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error occurred while getting the books with {exc}"
+        )
+
+
+@app.patch(
+    "/book/{title}",
+    response_model=Book,
+    response_description="Patch partial Book details",
+    description="Patch Book details for given book title"
+)
+def patch_book(title: str, book: Book = Body(default=None)):
+    try:
+        current_book = client[DB_NAME][BOOK_COLLECTION].find_one(
+            {"title": title},
+            {"_id": False}
+        )
+        # If the book is not found, raise 404
+        if not current_book:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No book found with title '{title}'"
+            )
+        # Convert current book to the Book model
+        current_book_model = Book(**jsonable_encoder(current_book))
+
+        # Get the updated fields and apply them to the current book
+        update_book = book.dict(exclude_unset=True)
+        update_book_result = current_book_model.copy(update=update_book)
+
+        # Convert the updated model back to JSON and add last_modified_at timestamp
+        update_book_json = jsonable_encoder(update_book_result)
+        update_book_json.update({"last_modified_at": f"{datetime.now()}"})
+
+        # Update the book in the database
+        update_result = client[DB_NAME][BOOK_COLLECTION].update_one(
+            {"title": title}, {"$set": update_book_json}
+        )
+        # Check if the update was successful
+        if update_result.modified_count == 1:
+            updated_result = client[DB_NAME][BOOK_COLLECTION].find_one(
+                {"title": title}, {"_id": False}
+            )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content=updated_result
+            )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content="No updates made. The data is already up to date."
+            )
+    except HTTPException as http_exc:
+        raise http_exc  # Reraise HTTPExceptions
+    except Exception as exc:
+        # Handle general exceptions and raise 500 internal server error
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error occurred while updating book with title '{title}': {exc}"
+        )
+
+
+@app.delete("/book/{title}")
+def delete_book(title: str):
+    try:
+        delete_result = client[DB_NAME][BOOK_COLLECTION].delete_one({"title": title})
+        if delete_result.deleted_count == 1:
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content=f"Book with title {title} has been deleted"
+            )
+        else:
+            # If no book was found with the provided title
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No book found with title '{title}'"
+            )
+    except Exception as exc:
+        # Catch any other exceptions and return a server error response
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while deleting the book: {exc}"
         )
 
 

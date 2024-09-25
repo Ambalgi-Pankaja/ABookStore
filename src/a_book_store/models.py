@@ -7,8 +7,9 @@ from enum import Enum
 class Book(BaseModel):
     title: str
     description: Optional[str]
+    genre: str
     author: str
-    publish_year: str
+    published_year: str
     price: float
     created_at: datetime = datetime.now()
     last_modified_at: datetime
