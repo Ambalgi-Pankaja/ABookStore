@@ -94,7 +94,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @app.post("/book")
-async def add_book(book: Book = Body(default=None),  current_user: User = Depends(get_current_user)):
+async def add_book(book: Book = Body(default=None), current_user: User = Depends(get_current_user)):
     try:
         book_json = jsonable_encoder(book)
 
@@ -169,7 +169,7 @@ async def get_books(
     response_description="Patch partial Book details",
     description="Patch Book details for given book title"
 )
-def patch_book(title: str, book: Book = Body(default=None),  current_user: User = Depends(get_current_user)):
+def patch_book(title: str, book: Book = Body(default=None), current_user: User = Depends(get_current_user)):
     try:
         current_book = client[DB_NAME][BOOK_COLLECTION].find_one(
             {"title": title},
@@ -221,7 +221,7 @@ def patch_book(title: str, book: Book = Body(default=None),  current_user: User 
 
 
 @app.delete("/book/{title}")
-def delete_book(title: str,  current_user: User = Depends(get_current_user)):
+def delete_book(title: str, current_user: User = Depends(get_current_user)):
     try:
         delete_result = client[DB_NAME][BOOK_COLLECTION].delete_one({"title": title})
         if delete_result.deleted_count == 1:
