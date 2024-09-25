@@ -8,8 +8,6 @@ jobs:
         uses: actions/checkout@v4
       - name: flake8 Lint
         uses: py-actions/flake8@v2
-      - name: Run flake8 lint
-        run: flake8 .\src\
         with:
           ignore: "E501"
           max-line-length: "100"
