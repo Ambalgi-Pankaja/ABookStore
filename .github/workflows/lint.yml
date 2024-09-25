@@ -10,3 +10,8 @@ jobs:
         uses: py-actions/flake8@v2
       - name: Run flake8 lint
         run: flake8 .\src\
+        with:
+          ignore: "E501"
+          max-line-length: "100"
+          path: "src"
+          plugins: "flake8-bugbear==22.1.11 flake8-black"
