@@ -64,7 +64,7 @@ def total_number_pages(total_items: int, limit: int) -> int:
     :param limit:
     :return:
     """
-    total_pages=math.ceil(total_items/limit)
+    total_pages = math.ceil(total_items / limit)
     return total_pages
 
 
