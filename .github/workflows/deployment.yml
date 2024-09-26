@@ -33,9 +33,4 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Run the application
-        run: cd src/a_book_store
-      - name: Run the application
-        run: ls
-      - name: Run
-        run: python -m app
-
+        run: cd src/a_book_store && ls && python -m app
