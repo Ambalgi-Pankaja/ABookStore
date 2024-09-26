@@ -31,8 +31,6 @@ jobs:
         run: |
           source .venv/bin/activate
           poetry install
-      - name: Install project
-        run: poetry install --no-interaction
       - name: Run tests
         run: |
           source .venv/bin/activate
