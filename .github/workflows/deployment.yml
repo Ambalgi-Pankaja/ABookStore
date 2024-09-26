@@ -33,5 +33,5 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Run the application
-        run: python -m a_book_store.app
+        run: ls
 
