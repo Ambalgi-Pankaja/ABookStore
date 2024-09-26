@@ -31,6 +31,6 @@ jobs:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install the project dependencies
-        run: poetry install --force
+        run: poetry install
       - name: Run the application
         run: a-book-store
