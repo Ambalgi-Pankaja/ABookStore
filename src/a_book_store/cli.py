@@ -10,12 +10,12 @@ def main():
     argp = argparse.ArgumentParser(
         description="Exposes catalog for retrieval",
         allow_abbrev=False,
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     argp.add_argument(
         "--database-uri",
         help=f"URI for mongodb. This can also be specified \n via the {env_prefix}database_uri environment variable.",
-        default=None
+        default=None,
     )
     args = vars(argp.parse_args())
 

@@ -29,7 +29,7 @@ def get_telemetry(name, version, family, start_time):
         "microservice_family": family,
         "os_version": platform.platform(),
         "uptime_in_secs": int(time.time() - start_time),
-        "hit_number": 0
+        "hit_number": 0,
     }
 
 
@@ -79,7 +79,7 @@ def has_next(page, total_pages):
 
 
 def has_prev(page):
-    """"
+    """ "
     Method to return True if prev page exists
     """
     return page > 1
