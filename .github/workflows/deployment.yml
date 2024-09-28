@@ -1,5 +1,5 @@
 name: A book store - Deploy
-on: push
+on: [push, workflow_dispatch, pull_request]
 jobs:
   lint_check:
     runs-on: ubuntu-latest
@@ -27,4 +27,4 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Run the application
-        run: echo deploy to server # poetry run python -m src.a_book_store.app
+        run: echo "deploy to server" # poetry run python -m src.a_book_store.app
