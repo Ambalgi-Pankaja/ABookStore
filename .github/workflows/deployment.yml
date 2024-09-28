@@ -13,6 +13,7 @@ jobs:
           max-line-length: "100"
           path: "src"
   deploy:
+    needs: lint_check
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
@@ -26,4 +27,4 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Run the application
-        run: echo run the application # poetry run python -m src.a_book_store.app
+        run: echo deploy to server # poetry run python -m src.a_book_store.app
