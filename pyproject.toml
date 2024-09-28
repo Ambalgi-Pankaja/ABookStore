@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ABookStore"
+name = "a_book_store"
 version = "0.1"
 description = "A simple Book store where user can login and purchase books"
 authors = ["Pankaja Ambalgi <pankaja.ambalgi@gmail.com>"]

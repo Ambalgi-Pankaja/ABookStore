@@ -29,7 +29,7 @@ def get_telemetry(name, version, family, start_time):
         "microservice_family": family,
         "os_version": platform.platform(),
         "uptime_in_secs": int(time.time() - start_time),
-        "hit_number": 0
+        "hit_number": 0,
     }
 
 
@@ -64,8 +64,9 @@ def total_number_pages(total_items: int, limit: int) -> int:
     :param limit:
     :return:
     """
-    total_pages = math.ceil(total_items/limit)
+    total_pages = math.ceil(total_items / limit)
     return total_pages
+
 
 def has_next(page, total_pages):
     """
@@ -76,11 +77,13 @@ def has_next(page, total_pages):
     """
     return page < total_pages
 
+
 def has_prev(page):
-    """"
+    """ "
     Method to return True if prev page exists
     """
     return page > 1
+
 
 def get_prev_page(page):
     if has_prev(page):

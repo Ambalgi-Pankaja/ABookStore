@@ -1,0 +1,30 @@
+name: A book store - Deploy
+on: [push, workflow_dispatch, pull_request]
+jobs:
+  lint_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          ignore: "E501"
+          max-line-length: "100"
+          path: "src"
+  deploy:
+    needs: lint_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v4
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install the project dependencies
+        run: poetry install
+      - name: Run the application
+        run: echo "deploy to server" # poetry run python -m src.a_book_store.app

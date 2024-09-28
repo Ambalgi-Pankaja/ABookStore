@@ -10,12 +10,12 @@ def main():
     argp = argparse.ArgumentParser(
         description="Exposes catalog for retrieval",
         allow_abbrev=False,
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     argp.add_argument(
-        "--database-uri",
+        "--databaseuri",
         help=f"URI for mongodb. This can also be specified \n via the {env_prefix}database_uri environment variable.",
-        default=None
+        default=None,
     )
     args = vars(argp.parse_args())
 
@@ -23,7 +23,7 @@ def main():
         if value is not None:
             os.environ[env_prefix + key.lower()] = value
 
-    uvicorn.run("a_book_store.app:app", host="0.0.0.0", port=8000)
+    uvicorn.run("a_book_store.app:app", host="127.0.0.1", port=8080)
 
 
 if __name__ == "__main__":
